@@ -1,0 +1,77 @@
+﻿@page "/patient/edit/{Id}"
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@using ClinicFlow_Blazor.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Patient</PageTitle>
+
+<h1>Edit Patient</h1>
+
+@if (patient != null)
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm Model="patient" OnValidSubmit="UpdatePatient">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+
+                <input type="hidden" name="patient.Id" value="@patient.Id" />
+
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name:</label>
+                    <InputText id="firstName" @bind-Value="patient.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => patient.FirstName)" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name:</label>
+                    <InputText id="lastName" @bind-Value="patient.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => patient.LastName)" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="patient.Email" class="form-control" />
+                    <ValidationMessage For="@(() => patient.Email)" class="text-danger" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="cpf" class="form-label">CPF:</label>
+                    <InputText id="cpf" @bind-Value="patient.Cpf" class="form-control" />
+                    <ValidationMessage For="@(() => patient.Cpf)" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Patient patient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        patient = await DB.Patients.FindAsync(Id);
+    }
+
+    public async Task UpdatePatient()
+    {
+        if (patient != null)
+        {
+            // Save changes to the database
+            DB.Patients.Update(patient);
+            await DB.SaveChangesAsync();
+
+            // Redirect to patients list page after update
+            NavigationManager.NavigateTo("/patients");
+        }
+    }
+}

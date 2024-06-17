@@ -1,0 +1,67 @@
+﻿@page "/patients/create"
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@using ClinicFlow_Blazor.DTO
+@using ClinicFlow_Blazor.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Cadastrar</h1>
+
+<h4>Paciente</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="patientDTO" OnValidSubmit="AddPacient" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="firstname" class="form-label">Primeiro Nome:</label> 
+                <InputText id="firstname" @bind-Value="patientDTO.FirstName" class="form-control" /> 
+                <ValidationMessage For="() => patientDTO.FirstName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lastname" class="form-label">Ultimo Nome:</label> 
+                <InputText id="lastname" @bind-Value="patientDTO.LastName" class="form-control" /> 
+                <ValidationMessage For="() => patientDTO.LastName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="patientDTO.Email" class="form-control" /> 
+                <ValidationMessage For="() => patientDTO.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="cpf" class="form-label">Cpf:</label> 
+                <InputText id="cpf" @bind-Value="patientDTO.Cpf" class="form-control" /> 
+                <ValidationMessage For="() => patientDTO.Cpf" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/patients">Voltar à lista</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public PatientDTO patientDTO { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddPacient()
+    {
+        Patient patient = new Patient
+            {
+                FirstName = patientDTO.FirstName,
+                LastName = patientDTO.LastName,
+                Email = patientDTO.Email,
+                Cpf = patientDTO.Cpf,
+            };
+
+        DB.Patients.Add(patient);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/patients");
+    }
+}

@@ -1,0 +1,95 @@
+﻿@page "/medicalappointments/create"
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext ApplicationDbContext
+@using ClinicFlow_Blazor.Models
+@using Microsoft.EntityFrameworkCore
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Cadastrar</h1>
+
+<h4>Consulta</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="medicalAppointment" OnValidSubmit="AddMedicalAppointment" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="doctorId" class="form-label">Médico :</label>
+                <InputSelect class = "form-control"id="doctorId" @bind-Value="medicalAppointment.DoctorId">
+                    <option value="">Selecionar Médico</option>
+                    @foreach (var doctor in doctors)
+                    {
+                        <option value="@doctor.Id">@doctor.FullName</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => medicalAppointment.DoctorId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="patientId" class="form-label">Paciente :</label>
+                <InputSelect id="patientId" class="form-control" @bind-Value="medicalAppointment.PatientId">
+                    <option value="">Selecionar Paciente</option>
+                    @foreach (var patient in patients)
+                    {
+                        <option value="@patient.Id">@patient.FullName</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => medicalAppointment.PatientId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="appointmentdate" class="form-label">Data da consulta :</label>
+                <InputDate id="appointmentdate" @bind-Value="medicalAppointment.AppointmentDate" class="form-control" />
+                <ValidationMessage For="() => medicalAppointment.AppointmentDate" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="diagnosis" class="form-label">Diagnóstico:</label>
+                <InputText id="diagnosis" @bind-Value="medicalAppointment.Diagnosis" class="form-control" step="1" />
+                <ValidationMessage For="() => medicalAppointment.Diagnosis" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/medicalappointments">Voltar à lista</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public MedicalAppointment medicalAppointment { get; set; } = new();
+
+    public List<Doctor> doctors { get; set; } = new List<Doctor>();
+    public List<Patient> patients { get; set; } = new List<Patient>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load doctors and patients from the database
+        await LoadDoctors();
+        await LoadPatients();
+    }
+
+    private async Task LoadDoctors()
+    {
+        doctors = await ApplicationDbContext.Doctors.ToListAsync();
+    }
+
+    private async Task LoadPatients()
+    {
+        patients = await ApplicationDbContext.Patients.ToListAsync();
+    }
+
+    public async Task AddMedicalAppointment()
+    {
+            var selectedDoctor = doctors.FirstOrDefault(d => d.Id == medicalAppointment.DoctorId);
+            var selectedPatient = patients.FirstOrDefault(p => p.Id == medicalAppointment.PatientId);
+
+            ApplicationDbContext.MedicalAppointments.Add(medicalAppointment);
+            await ApplicationDbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/medicalappointments");   
+    
+    }
+}

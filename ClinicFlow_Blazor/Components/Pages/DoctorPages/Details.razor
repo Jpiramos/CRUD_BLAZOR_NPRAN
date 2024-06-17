@@ -1,0 +1,52 @@
+﻿@page "/doctors/details"
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@using ClinicFlow_Blazor.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Detalhes</h1>
+
+<div>
+    <h4>Médico</h4>
+    <hr />
+    @if (doctor is null)
+    {
+        <p><em>Carregando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Especialização</dt>
+            <dd class="col-sm-10">@doctor.Specialty</dd>
+            <dt class="col-sm-2">Primeiro Nome</dt>
+            <dd class="col-sm-10">@doctor.FirstName</dd>
+            <dt class="col-sm-2">Ultimo Nome</dt>
+            <dd class="col-sm-10">@doctor.LastName</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@doctor.Email</dd>
+            <dt class="col-sm-2">Cpf</dt>
+            <dd class="col-sm-10">@doctor.Cpf</dd>
+        </dl>
+        <div>
+            <a href="@($"/doctors")">Voltar á lista</a>
+        </div>
+    }
+</div>
+
+@code {
+    Doctor? doctor;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = await DB.Doctors.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (doctor is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

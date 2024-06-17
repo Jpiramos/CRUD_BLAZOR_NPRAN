@@ -1,0 +1,23 @@
+﻿@page "/medicalappointments"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@using ClinicFlow_Blazor.Models
+
+<PageTitle>Index</PageTitle>
+
+<h1>Lista de Consultas</h1>
+
+<p>
+    <a href="medicalappointments/create">Cadastrar Consulta</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.MedicalAppointments">
+    <PropertyColumn Property="medicalappointment => medicalappointment.PatientId" Title="Id do Paciente" />
+    <PropertyColumn Property="medicalappointment => medicalappointment.DoctorId" Title="Id do Médico" />
+    <PropertyColumn Property="medicalappointment => medicalappointment.AppointmentDate" Title="Data da Consulta" />
+
+    <TemplateColumn Context="medicalappointment">
+        <a href="@($"medicalappointments/details?doctorid={medicalappointment.DoctorId}")">Detalhes</a> |
+        <a href="@($"medicalappointments/delete?doctorid={medicalappointment.DoctorId}")">Deletar</a>
+    </TemplateColumn>
+</QuickGrid>

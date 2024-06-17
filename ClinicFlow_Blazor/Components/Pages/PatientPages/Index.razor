@@ -1,0 +1,25 @@
+﻿@page "/patients"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@using ClinicFlow_Blazor.Models
+
+<PageTitle>Index</PageTitle>
+
+<h1>Lista de Pacientes</h1>
+
+<p>
+    <a href="patients/create">Cadastrar Paciente</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Patients">
+    <PropertyColumn Property="pacient => pacient.FirstName" Title="Primeiro Nome" />
+    <PropertyColumn Property="pacient => pacient.LastName" Title="Ultimo Nome" />
+    <PropertyColumn Property="pacient => pacient.Email" />
+    <PropertyColumn Property="pacient => pacient.Cpf" />
+
+    <TemplateColumn Context="pacient">
+
+        <a href="@($"patients/details?id={pacient.Id}")">Detalhes</a> |
+        <a href="@($"patients/delete?id={pacient.Id}")">Deletar</a>
+    </TemplateColumn>
+</QuickGrid>

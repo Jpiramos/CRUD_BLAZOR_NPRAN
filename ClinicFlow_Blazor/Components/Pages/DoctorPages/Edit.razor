@@ -1,0 +1,146 @@
+﻿@page "/doctors/edit/{Id:int}"
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@inject NavigationManager NavigationManager
+@using ClinicFlow_Blazor.DTO
+@using ClinicFlow_Blazor.Models
+@using Microsoft.EntityFrameworkCore
+                   
+<PageTitle>Edit Doctor</PageTitle>
+
+<h1>Edit Doctor</h1>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (loadError)
+{
+    <p class="text-danger">Error loading doctor. Please try again later.</p>
+}
+else if (doctorDTO == null)
+{
+    <p>Doctor not found.</p>
+}
+else
+{
+    <EditForm FormName="edit" Model="doctorDTO" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <div class="mb-3">
+            <label for="firstname" class="form-label">Primeiro Nome:</label>
+            <InputText id="firstname" @bind-Value="doctorDTO.FirstName" class="form-control" />
+            <ValidationMessage For="() => doctorDTO.FirstName" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="lastname" class="form-label">Ultimo Nome:</label>
+            <InputText id="lastname" @bind-Value="doctorDTO.LastName" class="form-control" />
+            <ValidationMessage For="() => doctorDTO.LastName" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <InputText id="email" @bind-Value="doctorDTO.Email" class="form-control" />
+            <ValidationMessage For="() => doctorDTO.Email" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="cpf" class="form-label">CPF:</label>
+            <InputText id="cpf" @bind-Value="doctorDTO.Cpf" class="form-control" />
+            <ValidationMessage For="() => doctorDTO.Cpf" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="specialty" class="form-label">Especialização:</label>
+            <InputText id="specialty" @bind-Value="doctorDTO.Specialty" class="form-control" />
+            <ValidationMessage For="() => doctorDTO.Specialty" class="text-danger" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+
+    @if (updateError)
+    {
+        <p class="text-danger">Error updating doctor. Please try again later.</p>
+    }
+}
+
+@code {
+    private DoctorDTO doctorDTO;
+    private bool isLoading = true;
+    private bool loadError = false;
+    private bool updateError = false;
+
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var doctor = await DB.Doctors.FindAsync(Id);
+            if (doctor != null)
+            {
+                doctorDTO = new DoctorDTO
+                    {
+                        Id = doctor.Id,
+                        FirstName = doctor.FirstName,
+                        LastName = doctor.LastName,
+                        Email = doctor.Email,
+                        Cpf = doctor.Cpf,
+                        Specialty = doctor.Specialty
+                    };
+            }
+        }
+        catch (Exception ex)
+        {
+            loadError = true;
+            Console.WriteLine($"Error loading doctor: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        updateError = false;
+        try
+        {
+            Console.WriteLine($"Updating doctor with Id: {doctorDTO.Id}, FirstName: {doctorDTO.FirstName}, LastName: {doctorDTO.LastName}, Email: {doctorDTO.Email}, CPF: {doctorDTO.Cpf}, Specialty: {doctorDTO.Specialty}");
+
+            var doctor = await DB.Doctors.FindAsync(doctorDTO.Id);
+            if (doctor != null)
+            {
+                doctor.FirstName = doctorDTO.FirstName;
+                doctor.LastName = doctorDTO.LastName;
+                doctor.Email = doctorDTO.Email;
+                doctor.Cpf = doctorDTO.Cpf;
+                doctor.Specialty = doctorDTO.Specialty;
+
+                DB.Entry(doctor).State = EntityState.Modified;
+                await DB.SaveChangesAsync();
+
+                Console.WriteLine("Doctor updated successfully.");
+
+                // Realiza a navegação
+               // NavigationManager.NavigateTo("/doctors");
+
+            }
+            else
+            {
+                Console.WriteLine("Doctor not found.");
+                updateError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            updateError = true;
+            Console.WriteLine($"Error updating doctor: {ex.Message}");
+        }
+    }
+
+}

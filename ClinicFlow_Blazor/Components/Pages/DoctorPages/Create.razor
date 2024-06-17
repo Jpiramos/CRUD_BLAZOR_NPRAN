@@ -1,0 +1,74 @@
+﻿@page "/doctors/create"
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@using ClinicFlow_Blazor.DTO
+@using ClinicFlow_Blazor.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Cadastrar</h1>
+
+<h4>Médico</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="doctorDTO" OnValidSubmit="AddDoctor" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />      
+            <div class="mb-3">
+                <label for="firstname" class="form-label">Primeiro Nome:</label> 
+                <InputText id="firstname" @bind-Value="doctorDTO.FirstName" class="form-control" /> 
+                <ValidationMessage For="() => doctorDTO.FirstName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lastname" class="form-label">Ultimo Nome:</label> 
+                <InputText id="lastname" @bind-Value="doctorDTO.LastName" class="form-control" /> 
+                <ValidationMessage For="() => doctorDTO.LastName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="doctorDTO.Email" class="form-control" /> 
+                <ValidationMessage For="() => doctorDTO.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="cpf" class="form-label">Cpf:</label> 
+                <InputText id="cpf" @bind-Value="doctorDTO.Cpf" class="form-control" /> 
+                <ValidationMessage For="() => doctorDTO.Cpf" class="text-danger" /> 
+            </div> 
+            <div class="mb-3">
+                <label for="specialty" class="form-label">Especialização:</label>
+                <InputText id="specialty" @bind-Value="doctorDTO.Specialty" class="form-control" />
+                <ValidationMessage For="() => doctorDTO.Specialty" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/doctors">Voltar à lista</a>
+</div>
+
+
+@code {
+
+    [SupplyParameterFromForm]
+    public DoctorDTO doctorDTO { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddDoctor()
+    {
+        Doctor doctor = new Doctor
+        {
+            FirstName = doctorDTO.FirstName,
+            LastName = doctorDTO.LastName,
+            Email = doctorDTO.Email,
+            Cpf = doctorDTO.Cpf,
+            Specialty = doctorDTO.Specialty   
+        };
+
+        DB.Doctors.Add(doctor);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/doctors");
+    }
+}

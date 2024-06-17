@@ -1,0 +1,61 @@
+﻿@page "/medicalappointments/details"
+@inject ClinicFlow_Blazor.Data.ApplicationDbContext DB
+@using ClinicFlow_Blazor.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Detalhes</h1>
+
+<div>
+    <h4>Consulta</h4>
+    <hr />
+    @if (medicalappointment is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Data</dt>
+            <dd class="col-sm-10">@medicalappointment.AppointmentDate</dd>
+            <dt class="col-sm-2">Diagnóstico</dt>
+            <dd class="col-sm-10">@medicalappointment.Diagnosis</dd>
+            <dt class="col-sm-2">Médico</dt>
+            <dd class="col-sm-10">@doctorFullName</dd>
+            <dt class="col-sm-2">Paciente</dt>
+            <dd class="col-sm-10">@patientFullName</dd>
+        </dl>
+        <div>
+            <a href="@($"/medicalappointments")">Voltar à lista</a>
+        </div>
+    }
+</div>
+
+@code {
+    MedicalAppointment? medicalappointment;
+    string doctorFullName;
+    string patientFullName;
+
+    [SupplyParameterFromQuery]
+    public int DoctorId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        medicalappointment = await DB.MedicalAppointments
+            .Include(m => m.Doctor)
+            .Include(m => m.Patient)
+            .FirstOrDefaultAsync(m => m.DoctorId == DoctorId);
+
+        if (medicalappointment is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+        else
+        {
+            doctorFullName = $"{medicalappointment.Doctor?.FirstName} {medicalappointment.Doctor?.LastName}" ?? "N/A";
+            patientFullName = $"{medicalappointment.Patient?.FirstName} {medicalappointment.Patient?.LastName}" ?? "N/A";
+        }
+    }
+}
