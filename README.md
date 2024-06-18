@@ -26,6 +26,8 @@ O projeto está organizado da seguinte forma:
 
 - [.NET 5 ou superior](https://dotnet.microsoft.com/download)
 - [Visual Studio 2019 ou superior](https://visualstudio.microsoft.com/)
+-  [SQL Server](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads)
+
 
 ## Como Configurar o Projeto
 
