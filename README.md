@@ -53,5 +53,5 @@ Pressione F5 ou clique em Executar no Visual Studio para iniciar o projeto.
 ______________________________________________________________________________________________________________________
 Este projeto é licenciado sob os termos da licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
-*Desenvolvido por João Pedro Ramos, Caio Vieira e Lucas Andrade.*
+*Desenvolvido por [João Pedro Ramos](https://github.com/Jpiramos), [Caio Vieira](https://github.com/Caio12131) e [Lucas Andrade](https://github.com/LukeAndrade23)*
 
